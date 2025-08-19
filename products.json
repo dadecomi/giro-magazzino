@@ -1,0 +1,302 @@
+[
+  {
+    "id": "P001",
+    "nome": "Prosciutto Cotto",
+    "descrizione": "Fetta di prosciutto cotto alta qualità.",
+    "barcode": "80000000001"
+  },
+  {
+    "id": "P002",
+    "nome": "Prosciutto Crudo",
+    "descrizione": "Stagionato, taglio sottile.",
+    "barcode": "80000000002"
+  },
+  {
+    "id": "P003",
+    "nome": "Salame Milano",
+    "descrizione": "Classico salame a grana fine.",
+    "barcode": "80000000003"
+  },
+  {
+    "id": "P004",
+    "nome": "Salame Napoli",
+    "descrizione": "Gusto intenso, leggermente affumicato.",
+    "barcode": "80000000004"
+  },
+  {
+    "id": "P005",
+    "nome": "Soppressata",
+    "descrizione": "Tipica calabrese, macinatura grossa.",
+    "barcode": "80000000005"
+  },
+  {
+    "id": "P006",
+    "nome": "Speck",
+    "descrizione": "Affumicato, stagionato in montagna.",
+    "barcode": "80000000006"
+  },
+  {
+    "id": "P007",
+    "nome": "Mortadella",
+    "descrizione": "Con pistacchi, profumo delicato.",
+    "barcode": "80000000007"
+  },
+  {
+    "id": "P008",
+    "nome": "Bresaola",
+    "descrizione": "Punta d'anca, magra e saporita.",
+    "barcode": "80000000008"
+  },
+  {
+    "id": "P009",
+    "nome": "Pancetta Arrotolata",
+    "descrizione": "Con pepe, stagionata.",
+    "barcode": "80000000009"
+  },
+  {
+    "id": "P010",
+    "nome": "Pancetta Tesa",
+    "descrizione": "Stagionatura tradizionale.",
+    "barcode": "80000000010"
+  },
+  {
+    "id": "P011",
+    "nome": "Coppa",
+    "descrizione": "Stagionata, marezzata.",
+    "barcode": "80000000011"
+  },
+  {
+    "id": "P012",
+    "nome": "Culatello",
+    "descrizione": "Pregiato, stagionato in cantina.",
+    "barcode": "80000000012"
+  },
+  {
+    "id": "P013",
+    "nome": "Guanciale",
+    "descrizione": "Per amatriciana e carbonara.",
+    "barcode": "80000000013"
+  },
+  {
+    "id": "P014",
+    "nome": "Lonza",
+    "descrizione": "Magro, stagionato.",
+    "barcode": "80000000014"
+  },
+  {
+    "id": "P015",
+    "nome": "Salsiccia Fresca",
+    "descrizione": "Macinato di suino da banco macelleria.",
+    "barcode": "80000000015"
+  },
+  {
+    "id": "P016",
+    "nome": "Salamella",
+    "descrizione": "Per griglia, fresca.",
+    "barcode": "80000000016"
+  },
+  {
+    "id": "P017",
+    "nome": "Cotechino",
+    "descrizione": "Da cuocere, tipico invernale.",
+    "barcode": "80000000017"
+  },
+  {
+    "id": "P018",
+    "nome": "Zampone",
+    "descrizione": "Ripieno di carne di suino.",
+    "barcode": "80000000018"
+  },
+  {
+    "id": "P019",
+    "nome": "Porchetta",
+    "descrizione": "Aromatica, cotta al forno.",
+    "barcode": "80000000019"
+  },
+  {
+    "id": "P020",
+    "nome": "Arrosto di Tacchino",
+    "descrizione": "Affettato leggero.",
+    "barcode": "80000000020"
+  },
+  {
+    "id": "P021",
+    "nome": "Roast Beef",
+    "descrizione": "Cotto al sangue, affettato.",
+    "barcode": "80000000021"
+  },
+  {
+    "id": "P022",
+    "nome": "Carne Macinata Bovino",
+    "descrizione": "Macinatura media.",
+    "barcode": "80000000022"
+  },
+  {
+    "id": "P023",
+    "nome": "Petto di Pollo",
+    "descrizione": "Filetti puliti, confezionati.",
+    "barcode": "80000000023"
+  },
+  {
+    "id": "P024",
+    "nome": "Cosce di Pollo",
+    "descrizione": "Pronte per forno o padella.",
+    "barcode": "80000000024"
+  },
+  {
+    "id": "P025",
+    "nome": "Ali di Pollo",
+    "descrizione": "Per frittura o forno.",
+    "barcode": "80000000025"
+  },
+  {
+    "id": "P026",
+    "nome": "Fesa di Tacchino",
+    "descrizione": "Fetta magra, affettato.",
+    "barcode": "80000000026"
+  },
+  {
+    "id": "P027",
+    "nome": "Braciole di Maiale",
+    "descrizione": "Taglio con osso.",
+    "barcode": "80000000027"
+  },
+  {
+    "id": "P028",
+    "nome": "Costine di Maiale",
+    "descrizione": "Per barbecue o forno.",
+    "barcode": "80000000028"
+  },
+  {
+    "id": "P029",
+    "nome": "Salsicce Piccanti",
+    "descrizione": "Con peperoncino.",
+    "barcode": "80000000029"
+  },
+  {
+    "id": "P030",
+    "nome": "Würstel di Suino",
+    "descrizione": "Classici per hot dog.",
+    "barcode": "80000000030"
+  },
+  {
+    "id": "P031",
+    "nome": "Würstel di Pollo",
+    "descrizione": "Leggeri, per bambini.",
+    "barcode": "80000000031"
+  },
+  {
+    "id": "P032",
+    "nome": "Lardo",
+    "descrizione": "Stagionato, per crostini.",
+    "barcode": "80000000032"
+  },
+  {
+    "id": "P033",
+    "nome": "Ciccioli",
+    "descrizione": "Tipici emiliani, croccanti.",
+    "barcode": "80000000033"
+  },
+  {
+    "id": "P034",
+    "nome": "Bresaola Punta d'Anca",
+    "descrizione": "Selezione premium.",
+    "barcode": "80000000034"
+  },
+  {
+    "id": "P035",
+    "nome": "Prosciutto di Parma",
+    "descrizione": "DOP, dolce.",
+    "barcode": "80000000035"
+  },
+  {
+    "id": "P036",
+    "nome": "Prosciutto San Daniele",
+    "descrizione": "DOP, stagionatura lunga.",
+    "barcode": "80000000036"
+  },
+  {
+    "id": "P037",
+    "nome": "Culaccia",
+    "descrizione": "Mora e gustosa.",
+    "barcode": "80000000037"
+  },
+  {
+    "id": "P038",
+    "nome": "Spalla Cotta",
+    "descrizione": "Affumicata, morbida.",
+    "barcode": "80000000038"
+  },
+  {
+    "id": "P039",
+    "nome": "Fiocco di Prosciutto",
+    "descrizione": "Magro, saporito.",
+    "barcode": "80000000039"
+  },
+  {
+    "id": "P040",
+    "nome": "Salame Ungherese",
+    "descrizione": "Affumicato, speziato.",
+    "barcode": "80000000040"
+  },
+  {
+    "id": "P041",
+    "nome": "Ventricina",
+    "descrizione": "Abruzzese, piccante.",
+    "barcode": "80000000041"
+  },
+  {
+    "id": "P042",
+    "nome": "'Nduja",
+    "descrizione": "Spalmabile, piccante.",
+    "barcode": "80000000042"
+  },
+  {
+    "id": "P043",
+    "nome": "Capocollo",
+    "descrizione": "Stagionato, aroma intenso.",
+    "barcode": "80000000043"
+  },
+  {
+    "id": "P044",
+    "nome": "Lonzino",
+    "descrizione": "Magro, profumato.",
+    "barcode": "80000000044"
+  },
+  {
+    "id": "P045",
+    "nome": "Sopressa Veneta",
+    "descrizione": "Morbida, delicata.",
+    "barcode": "80000000045"
+  },
+  {
+    "id": "P046",
+    "nome": "Salame Felino",
+    "descrizione": "IGP, grana fine.",
+    "barcode": "80000000046"
+  },
+  {
+    "id": "P047",
+    "nome": "Cacciatorini",
+    "descrizione": "Piccoli salami stagionati.",
+    "barcode": "80000000047"
+  },
+  {
+    "id": "P048",
+    "nome": "Salamino Piccante",
+    "descrizione": "Per pizza e panini.",
+    "barcode": "80000000048"
+  },
+  {
+    "id": "P049",
+    "nome": "Porchetta di Ariccia",
+    "descrizione": "Tradizionale, sapida.",
+    "barcode": "80000000049"
+  },
+  {
+    "id": "P050",
+    "nome": "Straccetti di Manzo",
+    "descrizione": "Sottili, cottura rapida.",
+    "barcode": "80000000050"
+  }
+]

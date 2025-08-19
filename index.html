@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Giro Magazzino</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#1e90ff" />
+  <style>
+    :root {
+      --bg: #f7fafc;
+      --primary: #1e90ff;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+      line-height: 1.3;
+    }
+    header {
+      position: sticky; top: 0; z-index: 5;
+      background: linear-gradient(90deg, var(--primary), #60a5fa);
+      color: white; padding: 12px 16px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    header h1 { font-size: 20px; margin: 0; }
+    .status-dot {width:10px;height:10px;border-radius:9999px;display:inline-block;margin-right:8px;background:#10b981}
+    .container { padding: 16px; max-width: 980px; margin: 0 auto 80px; }
+    .card {
+      background: var(--card); border-radius: 16px; padding: 16px; margin-bottom: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    }
+    .btn {
+      font-size: 20px; padding: 14px 16px; border: 0; border-radius: 14px;
+      display: inline-flex; gap: 10px; align-items: center; justify-content: center;
+      cursor: pointer; width: 100%; margin: 6px 0; color: white;
+      touch-action: manipulation;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-lg { font-size: 22px; padding: 18px; }
+    .btn-primary { background: var(--primary); }
+    .btn-ok { background: var(--ok); }
+    .btn-warn { background: var(--warn); }
+    .btn-bad { background: var(--bad); }
+    .grid { display: grid; gap: 10px; grid-template-columns: repeat(2, 1fr); }
+    .row { display:flex; gap:10px; }
+    .row > * { flex:1; }
+    .label { color: var(--muted); font-size: 14px; margin-bottom: 6px; }
+    input, select, textarea {
+      width: 100%; font-size: 22px; padding: 12px; border-radius: 12px; border: 2px solid #e5e7eb;
+    }
+    textarea { min-height: 80px; }
+    .pill {
+      background:#e5efff; color:#1e3a8a; border-radius:9999px; padding:6px 10px; font-size:14px;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    nav.bottom {
+      position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 8px; z-index: 10;
+    }
+    nav.bottom button {
+      font-size: 14px; padding: 10px 4px; border:0; background: #f3f4f6; border-radius: 10px;
+    }
+    .muted { color: var(--muted); }
+    .hidden { display: none !important; }
+    .product-name { font-size: 22px; font-weight: 700; }
+    .product-desc { font-size: 16px; color: var(--muted); }
+    .progress { height: 10px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+    .progress > div { height: 100%; background: var(--primary); width: 0%; }
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; background:#e5e7eb;padding:2px 6px;border-radius:6px; }
+    .badge { background:#111827; color:#fff; border-radius:8px; padding:4px 8px; font-size:12px; }
+    .toast {
+      position: fixed; top: 12px; right: 12px; background:#111827; color:#fff; padding:12px 16px; border-radius:10px; z-index: 50;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    .modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 40;
+    }
+    .modal .content { background:#fff; border-radius: 14px; padding: 16px; width: min(520px, 96vw); }
+    .kiosk { font-size: 26px; }
+    .small { font-size: 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Giro Magazzino</h1>
+    <div>
+      <span class="badge" id="sessionBadge">nessun giro</span>
+    </div>
+  </header>
+  <div class="container">
+    <section id="home">
+      <div class="card">
+        <h2>Benvenuto</h2>
+        <p class="muted">App semplice per registrare <strong>scadenze</strong> e <strong>rotture</strong> durante il giro.</p>
+        <div class="grid">
+          <button class="btn btn-primary btn-lg" id="btnNew">➕ Nuovo Giro</button>
+          <button class="btn btn-primary btn-lg" id="btnContinue">▶️ Continua Giro</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row" style="align-items:center">
+          <div style="flex:2">
+            <div class="label">Ricerca prodotto</div>
+            <input id="search" type="text" placeholder="Cerca nome o barcode..." />
+          </div>
+          <div style="flex:1">
+            <div class="label">Mostra</div>
+            <select id="filterSelect">
+              <option value="all">Tutti</option>
+              <option value="todo">Da controllare</option>
+              <option value="done">Controllati</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div id="productList"></div>
+    </section>
+
+    <section id="giro" class="hidden">
+      <div class="card">
+        <div class="row" style="align-items:center">
+          <div><span class="pill"><span class="status-dot"></span>Attivo</span></div>
+          <div style="margin-left:auto"><span class="muted">Prodotto <span id="idxPos">0</span>/<span id="idxTotal">0</span></span></div>
+        </div>
+        <div class="progress" style="margin: 10px 0 6px"><div id="progressBar"></div></div>
+        <div id="productCard" class="card" style="margin:10px 0 0">
+          <div class="product-name" id="pName">Prodotto</div>
+          <div class="product-desc" id="pDesc">Descrizione...</div>
+          <div class="muted small" id="pBarcode"></div>
+        </div>
+        <div class="grid">
+          <button class="btn btn-ok kiosk" data-status="OK">✅ OK</button>
+          <button class="btn btn-warn kiosk" data-status="IN_SCADENZA">⏳ In scadenza</button>
+          <button class="btn btn-bad kiosk" data-status="ROTTA">🧯 Rotta</button>
+          <button class="btn btn-bad kiosk" data-status="SCADUTA">⛔ Scaduta</button>
+        </div>
+        <div class="row" style="margin-top:6px">
+          <button class="btn btn-primary" id="btnPrev">⬅️ Indietro</button>
+          <button class="btn btn-primary" id="btnNext">Avanti ➡️</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="apparta" class="hidden">
+      <div class="card">
+        <h3>Apparta merce rotta/scaduta</h3>
+        <div id="appartaList" class="card"></div>
+      </div>
+    </section>
+
+    <section id="export" class="hidden">
+      <div class="card">
+        <h3>Esporta giro</h3>
+        <div class="row">
+          <button class="btn btn-primary" id="btnExportCSV">📄 Esporta Excel (CSV)</button>
+          <button class="btn" id="btnExportJSON" style="background:#334155;color:white">🗂️ Esporta JSON</button>
+        </div>
+        <div class="row">
+          <button class="btn" id="btnCloseSession" style="background:#0ea5e9;color:white">✅ Chiudi Giro</button>
+          <button class="btn" id="btnReopenLast" style="background:#10b981;color:white">🔄 Riapri ultimo</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <nav class="bottom">
+    <button data-tab="home">🏠 Home</button>
+    <button data-tab="giro">📝 Giro</button>
+    <button data-tab="apparta">📦 Apparta</button>
+    <button data-tab="export">⬇️ Export</button>
+  </nav>
+
+  <div class="modal" id="modal">
+    <div class="content">
+      <h3 id="modalTitle">Dettagli</h3>
+      <div class="grid">
+        <div>
+          <div class="label">Quantità</div>
+          <input id="mQty" type="number" min="1" value="1" />
+        </div>
+        <div>
+          <div class="label">Scadenza</div>
+          <input id="mExp" type="date" />
+        </div>
+      </div>
+      <div class="label" style="margin-top:10px">Note</div>
+      <textarea id="mNote" placeholder="Es: confezione ammaccata, odore..."></textarea>
+      <div class="row" style="margin-top:10px">
+        <button class="btn btn-primary" id="mConfirm">Salva</button>
+        <button class="btn" id="mCancel" style="background:#9ca3af;color:#111827">Annulla</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden">Salvato</div>
+
+  <script>
+    // --- Service Worker ---
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(console.error);
+      });
+    }
+
+    // --- IndexedDB helpers ---
+    const DB_NAME = 'magazzino-db';
+    const DB_VERSION = 1;
+    let db;
+
+    function openDB(){
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const d = e.target.result;
+          if(!d.objectStoreNames.contains('products')) d.createObjectStore('products', { keyPath: 'id' });
+          if(!d.objectStoreNames.contains('sessions')) d.createObjectStore('sessions', { keyPath: 'id' });
+          if(!d.objectStoreNames.contains('checks')) d.createObjectStore('checks', { keyPath: 'key' }); // key = sessionId|productId|n
+          if(!d.objectStoreNames.contains('setaside')) d.createObjectStore('setaside', { keyPath: 'key' }); // key = sessionId|productId|ts
+        };
+        req.onsuccess = () => { db = req.result; resolve(db); };
+        req.onerror = () => reject(req.error);
+      });
+    }
+    function tx(store, mode='readonly'){
+      return db.transaction(store, mode).objectStore(store);
+    }
+    function put(store, val){
+      return new Promise((res, rej) => {
+        const r = tx(store, 'readwrite').put(val);
+        r.onsuccess = () => res(true);
+        r.onerror = () => rej(r.error);
+      });
+    }
+    function get(store, key){
+      return new Promise((res, rej) => {
+        const r = tx(store, 'readonly').get(key);
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+      });
+    }
+    function getAll(store){
+      return new Promise((res, rej) => {
+        const r = tx(store, 'readonly').getAll();
+        r.onsuccess = () => res(r.result || []);
+        r.onerror = () => rej(r.error);
+      });
+    }
+    function del(store, key){
+      return new Promise((res, rej) => {
+        const r = tx(store, 'readwrite').delete(key);
+        r.onsuccess = () => res(true);
+        r.onerror = () => rej(r.error);
+      });
+    }
+
+    // --- State ---
+    let PRODUCTS = [];
+    let currentIndex = 0;
+    let currentSession = null; // {id, start, end, status}
+
+    // --- UI helpers ---
+    function showToast(msg){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 1400);
+    }
+    function setTab(tab){
+      for(const id of ['home','giro','apparta','export']){
+        document.getElementById(id).classList.toggle('hidden', id !== tab);
+      }
+    }
+    function updateSessionBadge(){
+      const b = document.getElementById('sessionBadge');
+      if(currentSession){
+        b.textContent = `giro ${currentSession.id} • ${new Date(currentSession.start).toLocaleString()}`;
+      } else {
+        b.textContent = 'nessun giro';
+      }
+    }
+
+    // --- Products ---
+    async function ensureProducts(){
+      const existing = await getAll('products');
+      if(existing && existing.length > 0){
+        PRODUCTS = existing;
+        return;
+      }
+      const resp = await fetch('./products.json').catch(()=>null);
+      if(!resp) return;
+      const list = await resp.json();
+      for(const p of list){ await put('products', p); }
+      PRODUCTS = list;
+    }
+
+    // --- Sessions ---
+    function newSessionId(){
+      const d = new Date();
+      return 'S' + d.getFullYear().toString().slice(-2) + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + '-' + d.getHours().toString().padStart(2,'0') + d.getMinutes().toString().padStart(2,'0');
+    }
+    async function createSession(){
+      const s = { id: newSessionId(), start: Date.now(), end: null, status: 'open' };
+      await put('sessions', s);
+      currentSession = s;
+      updateSessionBadge();
+      showToast('Nuovo giro creato');
+      currentIndex = 0;
+      refreshGiroUI();
+    }
+    async function getLastOpenSession(){
+      const all = await getAll('sessions');
+      const open = all.filter(s => s.status === 'open').sort((a,b)=>b.start-a.start);
+      return open[0] || null;
+    }
+    async function getLastSession(){
+      const all = await getAll('sessions');
+      const ordered = all.sort((a,b)=>b.start-a.start);
+      return ordered[0] || null;
+    }
+    async function closeCurrentSession(){
+      if(!currentSession) return;
+      currentSession.end = Date.now();
+      currentSession.status = 'closed';
+      await put('sessions', currentSession);
+      showToast('Giro chiuso');
+      currentSession = null;
+      updateSessionBadge();
+    }
+    async function reopenLastSession(){
+      const s = await getLastSession();
+      if(!s){ showToast('Nessun giro trovato'); return; }
+      s.status = 'open';
+      await put('sessions', s);
+      currentSession = s;
+      updateSessionBadge();
+      showToast('Giro riaperto');
+    }
+
+    // --- Checks ---
+    async function getChecksForSession(sessionId){
+      const all = await getAll('checks');
+      return all.filter(c => c.sessionId === sessionId);
+    }
+    async function getCheckForProduct(sessionId, productId){
+      const all = await getAll('checks');
+      return all.find(c => c.sessionId === sessionId && c.productId === productId) || null;
+    }
+    async function saveCheck(product, status, details){
+      if(!currentSession){ await createSession(); }
+      const existing = await getCheckForProduct(currentSession.id, product.id);
+      const key = existing ? existing.key : `${currentSession.id}|${product.id}|0`;
+      const payload = {
+        key, sessionId: currentSession.id, productId: product.id,
+        productName: product.nome, status, qty: details?.qty || 1,
+        expDate: details?.expDate || null, note: details?.note || '',
+        ts: Date.now(), setAsideAt: existing ? existing.setAsideAt || null : null
+      };
+      await put('checks', payload);
+      showToast('Salvato');
+      refreshLists();
+    }
+
+    // --- Set Aside ---
+    async function markSetAside(productId){
+      const chk = await getCheckForProduct(currentSession.id, productId);
+      if(!chk){ showToast('Prima registra lo stato'); return; }
+      chk.setAsideAt = Date.now();
+      await put('checks', chk);
+      showToast('Appartato');
+      refreshApparta();
+    }
+
+    // --- UI: Home list ---
+    function productMatches(p, term){
+      term = term.trim().toLowerCase();
+      if(!term) return true;
+      return p.nome.toLowerCase().includes(term) || (p.barcode && p.barcode.includes(term));
+    }
+    async function refreshLists(){
+      // Home list
+      const listEl = document.getElementById('productList');
+      listEl.innerHTML = '';
+      const term = document.getElementById('search').value || '';
+      const filter = document.getElementById('filterSelect').value;
+      const checks = currentSession ? await getChecksForSession(currentSession.id) : [];
+      const doneIds = new Set(checks.map(c => c.productId));
+
+      const filtered = PRODUCTS.filter(p => productMatches(p, term)).filter(p => {
+        if(filter === 'all') return true;
+        if(filter === 'todo') return !doneIds.has(p.id);
+        if(filter === 'done') return doneIds.has(p.id);
+      });
+
+      for(const p of filtered){
+        const checked = checks.find(c => c.productId === p.id);
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="row" style="align-items:center">
+            <div style="flex:2">
+              <div class="product-name">${p.nome}</div>
+              <div class="product-desc">${p.descrizione}</div>
+              <div class="muted small">barcode: ${p.barcode}</div>
+              ${checked ? `<div class="small"><span class="badge">Stato: ${labelFor(checked.status)}</span></div>` : ''}
+            </div>
+            <div style="flex:1">
+              <button class="btn btn-primary">✍️ Segna</button>
+              ${(checked && (checked.status==='SCADUTA' || checked.status==='ROTTA') && !checked.setAsideAt) ? `<button class="btn btn-bad">📦 Apparta</button>` : ''}
+            </div>
+          </div>
+        `;
+        const [btnSegna, btnApparta] = card.querySelectorAll('button');
+        btnSegna.onclick = () => openGiroOnProduct(p.id);
+        if(btnApparta){
+          btnApparta.onclick = () => markSetAside(p.id);
+        }
+        listEl.appendChild(card);
+      }
+    }
+
+    // --- UI: Giro ---
+    function labelFor(status){
+      switch(status){
+        case 'OK': return 'OK';
+        case 'IN_SCADENZA': return 'In scadenza';
+        case 'ROTTA': return 'Rotta';
+        case 'SCADUTA': return 'Scaduta';
+      }
+      return status;
+    }
+    function refreshGiroUI(){
+      const total = PRODUCTS.length;
+      document.getElementById('idxTotal').textContent = total;
+      const p = PRODUCTS[currentIndex] || PRODUCTS[0];
+      if(!p) return;
+      document.getElementById('idxPos').textContent = currentIndex+1;
+      document.getElementById('pName').textContent = p.nome;
+      document.getElementById('pDesc').textContent = p.descrizione;
+      document.getElementById('pBarcode').textContent = 'barcode: ' + p.barcode;
+      document.getElementById('progressBar').style.width = ((currentIndex+1)/total*100) + '%';
+    }
+    function openGiroOnProduct(productId){
+      const idx = PRODUCTS.findIndex(p => p.id === productId);
+      if(idx >= 0){
+        currentIndex = idx;
+        refreshGiroUI();
+        setTab('giro');
+      }
+    }
+
+    // --- UI: Apparta ---
+    async function refreshApparta(){
+      const cont = document.getElementById('appartaList');
+      cont.innerHTML = '';
+      if(!currentSession){ cont.innerHTML = '<span class="muted">Nessun giro attivo</span>'; return; }
+      const checks = await getChecksForSession(currentSession.id);
+      const needed = checks.filter(c => (c.status==='SCADUTA' || c.status==='ROTTA') && !c.setAsideAt);
+      if(needed.length === 0){
+        cont.innerHTML = '<span class="muted">Niente da appartare 👍</span>';
+        return;
+      }
+      for(const c of needed){
+        const card = document.createElement('div');
+        card.className = 'row';
+        card.innerHTML = `
+          <div style="flex:2">
+            <div class="product-name">${c.productName}</div>
+            <div class="small muted">Stato: ${labelFor(c.status)} • Qta: ${c.qty} ${c.expDate ? '• Scade: '+c.expDate : ''}</div>
+          </div>
+          <div style="flex:1">
+            <button class="btn btn-bad">📦 Segna come Appartata</button>
+          </div>
+        `;
+        card.querySelector('button').onclick = () => markSetAside(c.productId);
+        cont.appendChild(card);
+      }
+    }
+
+    // --- Export ---
+    function toCSV(rows){
+      if(rows.length === 0) return '';
+      const headers = Object.keys(rows[0]);
+      const escape = (v) => {
+        if(v===null || v===undefined) return '';
+        v = String(v);
+        if(v.includes('"') || v.includes(',') || v.includes('\n')){
+          v = '"' + v.replace(/"/g, '""') + '"';
+        }
+        return v;
+      };
+      const lines = [headers.join(',')];
+      for(const r of rows){
+        lines.push(headers.map(h => escape(r[h])).join(','));
+      }
+      return lines.join('\n');
+    }
+    async function exportCurrentSessionCSV(){
+      if(!currentSession){ showToast('Nessun giro'); return; }
+      const checks = await getChecksForSession(currentSession.id);
+      const rows = checks.map(c => ({
+        sessionId: c.sessionId,
+        productId: c.productId,
+        productName: c.productName,
+        status: labelFor(c.status),
+        qty: c.qty,
+        expDate: c.expDate || '',
+        note: c.note || '',
+        savedAt: new Date(c.ts).toLocaleString(),
+        setAsideAt: c.setAsideAt ? new Date(c.setAsideAt).toLocaleString() : ''
+      }));
+      const csv = toCSV(rows);
+      const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${currentSession.id}-giro.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+    async function exportCurrentSessionJSON(){
+      if(!currentSession){ showToast('Nessun giro'); return; }
+      const checks = await getChecksForSession(currentSession.id);
+      const blob = new Blob([JSON.stringify({session: currentSession, checks}, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${currentSession.id}-giro.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // --- Modal ---
+    const modal = document.getElementById('modal');
+    const mQty = document.getElementById('mQty');
+    const mExp = document.getElementById('mExp');
+    const mNote = document.getElementById('mNote');
+    let modalStatus = 'OK';
+    function openModal(status){
+      modalStatus = status;
+      document.getElementById('modalTitle').textContent =
+        status === 'IN_SCADENZA' ? 'In scadenza' :
+        status === 'ROTTA' ? 'Merce rotta' :
+        status === 'SCADUTA' ? 'Merce scaduta' : 'Dettagli';
+      // Defaults
+      mQty.value = 1;
+      mExp.value = '';
+      mNote.value = '';
+      // Show/hide scadenza field
+      mExp.parentElement.parentElement.style.display = (status === 'IN_SCADENZA' || status === 'SCADUTA') ? 'block' : 'block';
+      modal.style.display = 'flex';
+    }
+    function closeModal(){ modal.style.display='none'; }
+    document.getElementById('mCancel').onclick = closeModal;
+    document.getElementById('mConfirm').onclick = async () => {
+      const p = PRODUCTS[currentIndex];
+      const details = {
+        qty: parseInt(mQty.value || '1', 10),
+        expDate: mExp.value || null,
+        note: mNote.value || ''
+      };
+      await saveCheck(p, modalStatus, details);
+      closeModal();
+    };
+
+    // --- Event listeners ---
+    document.querySelectorAll('nav.bottom button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.getAttribute('data-tab');
+        setTab(tab);
+        if(tab === 'apparta') refreshApparta();
+      });
+    });
+
+    document.getElementById('btnNew').onclick = createSession;
+    document.getElementById('btnContinue').onclick = async () => {
+      const s = await getLastOpenSession();
+      if(!s){ showToast('Nessun giro aperto'); return; }
+      currentSession = s;
+      updateSessionBadge();
+      setTab('giro');
+      refreshGiroUI();
+    };
+    document.getElementById('btnPrev').onclick = () => { if(currentIndex>0){ currentIndex--; refreshGiroUI(); } };
+    document.getElementById('btnNext').onclick = () => { if(currentIndex<PRODUCTS.length-1){ currentIndex++; refreshGiroUI(); } };
+
+    document.querySelectorAll('.kiosk').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const status = btn.getAttribute('data-status');
+        const p = PRODUCTS[currentIndex];
+        if(status === 'OK'){
+          await saveCheck(p, 'OK', {qty:1});
+        } else {
+          openModal(status);
+        }
+      });
+    });
+
+    document.getElementById('btnExportCSV').onclick = exportCurrentSessionCSV;
+    document.getElementById('btnExportJSON').onclick = exportCurrentSessionJSON;
+    document.getElementById('btnCloseSession').onclick = closeCurrentSession;
+    document.getElementById('btnReopenLast').onclick = reopenLastSession;
+
+    document.getElementById('search').addEventListener('input', refreshLists);
+    document.getElementById('filterSelect').addEventListener('change', refreshLists);
+
+    // --- Init ---
+    (async function init(){
+      await openDB();
+      await ensureProducts();
+      updateSessionBadge();
+      refreshGiroUI();
+      refreshLists();
+      setTab('home');
+    })();
+  </script>
+</body>
+</html>
